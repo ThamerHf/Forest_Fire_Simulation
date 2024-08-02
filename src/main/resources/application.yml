@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: forest_fire_simulation
+
+forest:
+  h: 10
+  l: 10
+  probability: 0.5
+
+mersenne:
+  initWithSeed: false
+  seed: 10

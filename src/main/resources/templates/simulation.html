@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation de Feu de Forêt</title>
+    <style>
+        .step-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .step {
+            border: 1px solid #ddd;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1 1 300px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .forest {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .forest-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .cell {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border: 1px solid #ddd;
+        }
+
+        .GREEN { background-color: green; }
+        .FIRE { background-color: red; }
+        .ASH { background-color: gray; }
+
+        @media (max-width: 600px) {
+            .cell {
+                width: 10px;
+                height: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Simulation de Feu de Forêt</h1>
+<div>
+    <h2>Étapes de la simulation :</h2>
+    <div class="step-container">
+        <div th:each="step, iterStat : ${steps}" class="step">
+            <h3>Étape [[${iterStat.index + 1}]]</h3>
+            <div class="forest-container">
+                <div class="forest">
+                    <div th:each="row : ${step.getForestGrid()}">
+                        <div th:each="cell : ${row}"
+                             class="cell"
+                             th:classappend="${cell.getCellStatus().toString().toUpperCase()}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

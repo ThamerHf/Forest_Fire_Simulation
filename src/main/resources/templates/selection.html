@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sélectionner les Cellules Initiales</title>
+    <style>
+        #initForest {
+            width: max-content;
+        }
+
+        .cellule {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .green { background-color: green; }
+        .fire { background-color: red; }
+    </style>
+</head>
+<body>
+<h1>Sélectionner les Cellules initialement en feu</h1>
+<form id="form" onsubmit="return sendData(event)">
+    <div id="initForest" role="grid">
+        <div id="grid-ligne" th:each="ligne, rowStat : ${initForest}">
+            <div id="grid-column" th:each="cellule, colStat : ${ligne}"
+                 class="cellule"
+                 th:classappend="${cellule == 'FIRE'} ? 'fire' : 'green'"
+                 th:data-x="${colStat.index}"
+                 th:data-y="${rowStat.index}"
+                 onclick="toggleCell(this)"
+                 role="gridcell"
+                 onkeydown="handleKeyDown(event, this)">
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="initialForest" name="initialForest"/>
+    <button type="submit">Démarrer la Simulation</button>
+</form>
+
+<script>
+    function toggleCell(cell) {
+        if (cell.classList.contains('fire')) {
+            cell.classList.remove('fire');
+            cell.classList.add('green');
+        } else {
+            cell.classList.remove('green');
+            cell.classList.add('fire');
+        }
+    }
+
+    function sendData(event) {
+        event.preventDefault();
+
+        const rows = document.querySelectorAll('#grid-ligne');
+        const grid = Array.from(rows).map(row => {
+            return Array.from(row.querySelectorAll('.cellule')).map(cell => {
+                return { cellStatus: cell.classList.contains('fire') ? 'FIRE' : 'GREEN' };
+            });
+        });
+
+        fetch('/simulate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'text/html'
+            },
+            body: JSON.stringify({ forestGrid: grid })
+        })
+            .then(response => response.text())
+            .then(html => {
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => console.error('Erreur:', error));
+
+        return false;
+    }
+
+
+
+    function handleKeyDown(event, cell) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            toggleCell(cell);
+        }
+    }
+</script>
+</body>
+</html>
